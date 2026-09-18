@@ -35,8 +35,50 @@
 
   <script>
     let html5QrCode;
+const GOOGLE_SCRIPT_URL = "ТАНЫ_APPS_SCRIPT_WEB_APP_URL"; 
 
-    function startScan() {
+function startScan() {
+  const statusDiv = document.getElementById('status');
+  statusDiv.style.color = "#333";
+  statusDiv.innerText = "Камер нээж байна...";
+
+  if (!html5QrCode) {
+    html5QrCode = new Html5Qrcode("reader");
+  }
+
+  html5QrCode.start(
+    { facingMode: "environment" }, 
+    { fps: 15, qrbox: { width: 250, height: 250 } }, 
+    async (decodedText) => {
+      // 1. Уншсан ID-г Textbox дээр харуулна
+      document.getElementById('userIdInput').value = decodedText;
+      html5QrCode.stop();
+
+      // 2. Google Sheet-ээс шалгана
+      statusDiv.style.color = "#007bff";
+      statusDiv.innerText = "⏳ Google Sheet-ээс ID шалгаж байна...";
+
+      try {
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?id=${encodeURIComponent(decodedText)}`);
+        const result = await response.json();
+
+        if (result.exists) {
+          statusDiv.style.color = "#28a745";
+          statusDiv.innerText = "✅ Google Sheet дээр ID олдлоо!";
+          document.getElementById('giveBtn').disabled = false; // Товчийг идэвхжүүлнэ
+        } else {
+          statusDiv.style.color = "red";
+          statusDiv.innerText = "❌ Ийм ID-тай хэрэглэгч Google Sheet дээр олдсонгүй!";
+          document.getElementById('giveBtn').disabled = true;
+        }
+      } catch (err) {
+        statusDiv.style.color = "red";
+        statusDiv.innerText = "❌ Дата шалгахад алдаа гарлаа: " + err;
+      }
+    }
+  );
+}
+    function startScan123() {
       const statusDiv = document.getElementById('status');
       statusDiv.style.color = "#333";
       statusDiv.innerText = "Камер нээж байна...";
