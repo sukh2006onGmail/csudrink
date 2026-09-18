@@ -109,36 +109,42 @@
     }
 
     // 3. УУХ ЮМ ОЛГОХ (+1)
-    async function giveDrink() {
-      if (!currentUser) return;
+async function giveDrink() {
+  if (!currentUser) return;
 
-      const giveBtn = document.getElementById('giveBtn');
-      giveBtn.disabled = true;
-      showStatus("⏳ Баазад хадгалж байна...", "#007bff");
+  // 1. ХАДГАЛАХААС ӨМНӨ ШАЛГАХ: Хэрэв аль хэдийн 5 болон түүнээс дээш авсан бол шууд тасална
+  if (currentUser.drinkCount >= 5) {
+    alert(`⚠️ АНХААРУУЛГА!\n\n${currentUser.name} (ID: ${currentUser.id}) сурагч хэзээ хэдийнэ ${currentUser.drinkCount} удаа уух юм авсан тул ДАХИН ОЛГОХ БОЛОМЖГҮЙ!`);
+    return; // Энд шууд тасалснаар Google Sheet рүү хадгалах хүсэлт явахгүй!
+  }
 
-      try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=drink&id=${encodeURIComponent(currentUser.id)}`, { redirect: "follow" });
-        const result = await response.json();
+  const giveBtn = document.getElementById('giveBtn');
+  giveBtn.disabled = true;
+  showStatus("⏳ Баазад хадгалж байна...", "#007bff");
 
-        if (result.success) {
-          currentUser.drinkCount = result.drinkCount;
-          displayUser(currentUser);
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=drink&id=${encodeURIComponent(currentUser.id)}`, { redirect: "follow" });
+    const result = await response.json();
 
-          // 5 БУЮУ ТҮҮНЭЭС ДЭЭШ ХҮРБЭЛ ALERT АНХААРУУЛГА ӨГӨХ
-          if (currentUser.drinkCount >= 5) {
-            alert(`⚠️ АНХААРУУЛГА!\n\n${currentUser.name} (ID: ${currentUser.id}) сурагч хэзээ хэдийнэ ${currentUser.drinkCount} удаа уух юм авсан байна!`);
-          }
+    if (result.success) {
+      currentUser.drinkCount = result.drinkCount;
+      displayUser(currentUser);
 
-          showStatus(`✅ Амжилттай олгогдлоо! Нийт: ${currentUser.drinkCount}`, "#28a745");
-        } else {
-          showStatus("❌ Хадгалахад алдаа гарлаа", "red");
-          giveBtn.disabled = false;
-        }
-      } catch (err) {
-        showStatus("❌ Сүлжээний алдаа: " + err, "red");
-        giveBtn.disabled = false;
+      // +1 болсны дараа 5-д хүрсэн бол мөн сануулга өгнө
+      if (currentUser.drinkCount >= 5) {
+        alert(`⚠️ АНХААРУУЛГА!\n\n${currentUser.name} (ID: ${currentUser.id}) сурагчийн авсан тоо ${currentUser.drinkCount}-д хүрлээ! Энэ сурагчийн сүүлчийн уух юм зааг шүү.`);
       }
+
+      showStatus(`✅ Амжилттай олгогдлоо! Нийт: ${currentUser.drinkCount}`, "#28a745");
+    } else {
+      showStatus("❌ Хадгалахад алдаа гарлаа", "red");
+      giveBtn.disabled = false;
     }
+  } catch (err) {
+    showStatus("❌ Сүлжээний алдаа: " + err, "red");
+    giveBtn.disabled = false;
+  }
+}
 
     function displayUser(user) {
       document.getElementById('resId').innerText = user.id;
