@@ -3,49 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSU Drink - QR & Manual Search</title>
+  <title>CSU Drink Manager</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; }
-    .card { max-width: 450px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    #reader { width: 100%; margin: 15px auto; border-radius: 8px; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; }
+    .card { max-width: 420px; margin: 0 auto; background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    #reader { width: 100%; margin: 15px auto; border-radius: 10px; overflow: hidden; }
     
     .input-group { margin: 15px 0; text-align: left; }
-    .input-group label { font-size: 14px; color: #666; font-weight: bold; display: block; margin-bottom: 5px; }
-    input[type="text"] { width: 93%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 6px; text-align: center; }
+    .input-group label { font-size: 13px; color: #666; font-weight: 600; display: block; margin-bottom: 6px; }
+    input[type="text"] { width: 92%; padding: 12px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 8px; text-align: center; outline: none; transition: border 0.2s; }
+    input[type="text"]:focus { border-color: #007bff; }
     
-    .btn { padding: 12px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 10px; }
+    .btn { padding: 12px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 10px; transition: opacity 0.2s; }
+    .btn:active { opacity: 0.8; }
     .btn-scan { background: #007bff; color: white; }
     .btn-search { background: #17a2b8; color: white; }
-    .btn-give { background: #28a745; color: white; }
-    .btn-give:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-give { background: #28a745; color: white; margin-top: 10px; }
+    .btn-give:disabled { background: #cbd5e1; cursor: not-allowed; }
     
-    #userCard { background: #e9ecef; padding: 15px; border-radius: 8px; margin-top: 15px; display: none; text-align: left; }
-    #userCard p { margin: 5px 0; font-size: 16px; }
-    #status { margin-top: 15px; font-weight: bold; font-size: 15px; word-break: break-all; }
+    #userCard { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; display: none; }
+    #userCard p { margin: 6px 0; font-size: 15px; }
+    .count-badge { font-weight: bold; font-size: 18px; padding: 2px 8px; border-radius: 6px; }
+    .count-ok { color: #28a745; }
+    .count-limit { color: #dc3545; background: #ffe8e6; }
+    
+    #status { margin-top: 15px; font-weight: bold; font-size: 15px; word-break: break-all; min-height: 22px; }
+    
+    /* Соёлтой сануулга (Alert Box) */
+    #alertBox { display: none; margin-top: 15px; padding: 12px; border-radius: 8px; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; text-align: left; font-size: 14px; }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h2>🥤 CSU Drink Manager</h2>
+    <h2>🥤 CSU Уух зүйлийн бүртгэл</h2>
     
-    <button class="btn btn-scan" onclick="startScan()">📷 QR Уншуулах</button>
+    <button class="btn btn-scan" onclick="startScan()">📷 QR Камер нээх</button>
     <div id="reader"></div>
 
     <div class="input-group">
-      <label>Хэрэглэгчийн ID эсвэл Нэрээр хайх:</label>
-      <input type="text" id="searchInput" placeholder="ID эсвэл Нэр бичнэ үү..." />
+      <label>ID эсвэл Нэрээр хайх:</label>
+      <input type="text" id="searchInput" placeholder="Жишээ: 1 эсвэл Participant" onkeypress="if(event.key==='Enter') searchUser()" />
     </div>
 
     <button class="btn btn-search" onclick="searchUser()">🔍 Хайх</button>
 
-    <!-- Олдсон сурагчийн мэдээлэл харагдах карт -->
+    <!-- Олдсон сурагчийн мэдээлэл -->
     <div id="userCard">
       <p><b>ID:</b> <span id="resId">-</span></p>
       <p><b>Нэр:</b> <span id="resName">-</span></p>
-      <p><b>Авсан уух юмны тоо:</b> <span id="resCount" style="font-size:18px; color:#d9534f; font-weight:bold;">0</span></p>
+      <p><b>Авсан уух зүйл:</b> <span id="resCount" class="count-badge">0</span>/5</p>
     </div>
+
+    <div id="alertBox"></div>
 
     <button id="giveBtn" class="btn btn-give" onclick="giveDrink()" disabled>+1 Уух юм олгох</button>
 
@@ -54,15 +65,14 @@
 
   <script>
     let html5QrCode;
-    // ТАНЫ GOOGLE APPS SCRIPT WEB APP URL:
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby48AGGTzygrb0kCK6yVxtET7RB4y5d0q6G8IgEL7VZuTzSNMNlBvqArNtH5tn8GOXAeg/exec"; 
 
     let currentUser = null;
 
-    // 1. QR КАМЕР НЭЭХ
+    // 1. QR КАМЕР
     function startScan() {
       resetUI();
-      document.getElementById('status').innerText = "Камер нээж байна...";
+      showStatus("Камер нээж байна...", "#333");
 
       if (!html5QrCode) {
         html5QrCode = new Html5Qrcode("reader");
@@ -74,18 +84,18 @@
         (decodedText) => {
           document.getElementById('searchInput').value = decodedText;
           html5QrCode.stop();
-          searchUser(); // Уншмагц автоматаар хайна
+          searchUser();
         }
       ).catch(err => {
         showStatus("❌ Алдаа: " + err, "red");
       });
     }
 
-    // 2. ХЭРЭГЛЭГЧ ХАЙХ (ID эсвэл Нэрээр)
+    // 2. ХАЙЛТ (ID эсвэл Нэрээр)
     async function searchUser() {
       const query = document.getElementById('searchInput').value.trim();
       if (!query) {
-        showStatus("⚠️ ID эсвэл Нэр бичнэ үү!", "orange");
+        showStatus("⚠️ ID эсвэл Нэрээ оруулна уу!", "orange");
         return;
       }
 
@@ -101,62 +111,80 @@
           showStatus("✅ Хэрэглэгч олдлоо!", "#28a745");
         } else {
           resetUI();
-          showStatus("❌ Ийм ID эсвэл Нэртэй сурагч олдсонгүй!", "red");
+          showStatus("❌ Ийм ID эсвэл Нэртэй хэрэглэгч олдсонгүй!", "red");
         }
       } catch (err) {
-        showStatus("❌ Алдаа гарлаа: " + err, "red");
+        showStatus("❌ Дата холболтын алдаа: " + err, "red");
       }
     }
 
     // 3. УУХ ЮМ ОЛГОХ (+1)
-async function giveDrink() {
-  if (!currentUser) return;
+    async function giveDrink() {
+      if (!currentUser) return;
 
-  // 1. ХАДГАЛАХААС ӨМНӨ ШАЛГАХ: Хэрэв аль хэдийн 5 болон түүнээс дээш авсан бол шууд тасална
-  if (currentUser.drinkCount >= 5) {
-    alert(`⚠️ АНХААРУУЛГА!\n\n${currentUser.name} (ID: ${currentUser.id}) сурагч хэзээ хэдийнэ ${currentUser.drinkCount} удаа уух юм авсан тул ДАХИН ОЛГОХ БОЛОМЖГҮЙ!`);
-    return; // Энд шууд тасалснаар Google Sheet рүү хадгалах хүсэлт явахгүй!
-  }
-
-  const giveBtn = document.getElementById('giveBtn');
-  giveBtn.disabled = true;
-  showStatus("⏳ Баазад хадгалж байна...", "#007bff");
-
-  try {
-    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=drink&id=${encodeURIComponent(currentUser.id)}`, { redirect: "follow" });
-    const result = await response.json();
-
-    if (result.success) {
-      currentUser.drinkCount = result.drinkCount;
-      displayUser(currentUser);
-
-      // +1 болсны дараа 5-д хүрсэн бол мөн сануулга өгнө
+      // Хадгалахаас өмнөх шалгалт
       if (currentUser.drinkCount >= 5) {
-        alert(`⚠️ АНХААРУУЛГА!\n\n${currentUser.name} (ID: ${currentUser.id}) сурагчийн авсан тоо ${currentUser.drinkCount}-д хүрлээ! Энэ сурагчийн сүүлчийн уух юм зааг шүү.`);
+        showAlert(`⚠️ <b>АНХААРУУЛГА:</b> ${currentUser.name} сурагчийн лимит (5/5) дууссан тул дахин олгох боломжгүй!`);
+        return;
       }
 
-      showStatus(`✅ Амжилттай олгогдлоо! Нийт: ${currentUser.drinkCount}`, "#28a745");
-    } else {
-      showStatus("❌ Хадгалахад алдаа гарлаа", "red");
-      giveBtn.disabled = false;
+      const giveBtn = document.getElementById('giveBtn');
+      giveBtn.disabled = true;
+      showStatus("⏳ Баазад хадгалж байна...", "#007bff");
+
+      try {
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=drink&id=${encodeURIComponent(currentUser.id)}`, { redirect: "follow" });
+        const result = await response.json();
+
+        if (result.success) {
+          currentUser.drinkCount = result.drinkCount;
+          displayUser(currentUser);
+          showStatus(`✅ Амжилттай олгогдлоо! Нийт: ${currentUser.drinkCount}`, "#28a745");
+        } else {
+          showStatus("❌ " + result.message, "red");
+          if (result.drinkCount !== undefined) {
+            currentUser.drinkCount = result.drinkCount;
+            displayUser(currentUser);
+          }
+        }
+      } catch (err) {
+        showStatus("❌ Алдаа гарлаа: " + err, "red");
+        giveBtn.disabled = false;
+      }
     }
-  } catch (err) {
-    showStatus("❌ Сүлжээний алдаа: " + err, "red");
-    giveBtn.disabled = false;
-  }
-}
 
     function displayUser(user) {
       document.getElementById('resId').innerText = user.id;
       document.getElementById('resName').innerText = user.name;
-      document.getElementById('resCount').innerText = user.drinkCount;
+      
+      const countEl = document.getElementById('resCount');
+      countEl.innerText = user.drinkCount;
+
+      const alertBox = document.getElementById('alertBox');
+      alertBox.style.display = "none";
+
+      if (user.drinkCount >= 5) {
+        countEl.className = "count-badge count-limit";
+        document.getElementById('giveBtn').disabled = true;
+        showAlert(`⚠️ <b>АНХААРУУЛГА:</b> Энэ сурагч хэзээ хэдийнэ <b>${user.drinkCount}</b> удаа авсан байна! Лимит дууссан.`);
+      } else {
+        countEl.className = "count-badge count-ok";
+        document.getElementById('giveBtn').disabled = false;
+      }
+
       document.getElementById('userCard').style.display = "block";
-      document.getElementById('giveBtn').disabled = false;
+    }
+
+    function showAlert(msg) {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.innerHTML = msg;
+      alertBox.style.display = "block";
     }
 
     function resetUI() {
       currentUser = null;
       document.getElementById('userCard').style.display = "none";
+      document.getElementById('alertBox').style.display = "none";
       document.getElementById('giveBtn').disabled = true;
       document.getElementById('status').innerText = "";
     }
