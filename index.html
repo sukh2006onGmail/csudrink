@@ -1,1 +1,56 @@
-<!DOCTYPE html><html lang="mn"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>QR Код Уншуулах v1.0</title>    <!-- QR код уншдаг бэлэн бөгөөд хөнгөн сан (Библиотек) -->    <script src="https://unpkg.com"></script>    <style>        body {            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;            background-color: #f4f6f9;            margin: 0;            display: flex;            flex-direction: column;            align-items: center;            padding: 20px;        }        .container {            max-width: 500px;            width: 100%;            background: white;            padding: 25px;            border-radius: 12px;            box-shadow: 0 4px 15px rgba(0,0,0,0.05);            text-align: center;            box-sizing: border-box;        }        h2 { color: #333; margin-top: 0; }        .btn {            background-color: #007bff;            color: white;            border: none;            padding: 12px 24px;            font-size: 16px;            font-weight: bold;            border-radius: 8px;            cursor: pointer;            width: 100%;            transition: background 0.2s;            margin-bottom: 15px;        }        .btn:hover { background-color: #0056b3; }        .btn.stop { background-color: #dc3545; }        .btn.stop:hover { background-color: #bd2130; }        #reader {            width: 100%;            background-color: #000;            border-radius: 8px;            overflow: hidden;            margin-top: 10px;        }        #result {            margin-top: 15px;            padding: 10px;            background-color: #e9ecef;            border-radius: 6px;            font-weight: bold;            word-wrap: break-word;            display: none;        }    </style></head><body><div class="container">    <h2>Уух зүйлийн бүртгэл</h2>        <!-- Камер нээх / хаах товч -->    <button id="scanBtn" class="btn" onclick="toggleScanner()">📷 Камер Нээх</button>        <!-- Камерын дүрс харагдах талбар -->    <div id="reader"></div>        <!-- QR кодноос уншсан үр дүнг харуулах талбар -->    <div id="result"></div></div><script>    let html5QrcodeScanner = null;    const readerId = "reader";    function toggleScanner() {        const btn = document.getElementById("scanBtn");        const resultDiv = document.getElementById("result");        // Хэрэв камер аль хэдийн ажиллаж байвал хаана        if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {            html5QrcodeScanner.stop().then(() => {                btn.textContent = "📷 Камер Нээх";                btn.className = "btn";                document.getElementById(readerId).style.display = "none";            }).catch(err => console.error("Камер хаахад алдаа гарлаа:", err));            return;        }        // Камер асаах тохиргоо        document.getElementById(readerId).style.display = "block";        resultDiv.style.display = "none";                html5QrcodeScanner = new Html5Qrcode(readerId);                const config = {             fps: 10,              // Секундэд 10 удаа код хайж уншина            qrbox: { width: 250, height: 250 } // QR код унших голын хүрээний хэмжээ        };        // Камер ажиллуулах үндсэн функц        html5QrcodeScanner.start(            { facingMode: "environment" }, // Утасны арын камерыг үндсэн болгож сонгоно            config,            (decodedText, decodedResult) => {                // QR КОД АМЖИЛТТАЙ УНШИГДВАЛ ЭНД АЖИЛЛАНА:                resultDiv.textContent = "Уншигдсан ID: " + decodedText;                resultDiv.style.display = "block";                                // Хэрэв уншсаны дараа камерыг шууд хаахыг хүсвэл доорх мөрийг идэвхжүүлж болно:                // toggleScanner();             },            (errorMessage) => {                // Камер зүгээр л код хайж байх үеийн лог (алдаа биш тул хоосон орхино)            }        ).then(() => {            btn.textContent = "🛑 Камер Хаах";            btn.className = "btn stop";        }).catch(err => {            alert("Камер нээхэд алдаа гарлаа. Зөвшөөрлийг шалгана уу!");            console.error(err);        });    }</script></body></html>
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Permission Test</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
+    button { padding: 12px 24px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    video { width: 100%; max-width: 400px; height: auto; margin-top: 15px; border: 2px solid #ccc; border-radius: 8px; background: #000; }
+    #status { margin-top: 15px; font-weight: bold; color: #333; word-break: break-all; }
+  </style>
+</head>
+<body>
+
+  <h2>📷 Камерын Зөвшөөрөл Шалгагч</h2>
+  <button onclick="startCamera()">Камер нээх</button>
+  
+  <div>
+    <video id="video" autoplay playsinline></video>
+  </div>
+  
+  <div id="status">Товч дээр дарж камерын эрхийг шалгана уу.</div>
+
+  <script>
+    async function startCamera() {
+      const statusDiv = document.getElementById('status');
+      const video = document.getElementById('video');
+      statusDiv.innerText = "Камер руу хандаж байна...";
+
+      try {
+        // Браузерын MediaDevices API ашиглан арын камерыг шаардах
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: "environment" } }
+        });
+        video.srcObject = stream;
+        statusDiv.style.color = "green";
+        statusDiv.innerText = "✅ Амжилттай! Камер зөвшөөрөгдөж, ажиллаж байна.";
+      } catch (err) {
+        console.warn("Exact environment camera failed, fallbacking...", err);
+        try {
+          // Арын камер олдохгүй бол ердийн замаар камер шаардах
+          const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          video.srcObject = fallbackStream;
+          statusDiv.style.color = "green";
+          statusDiv.innerText = "✅ Амжилттай! (Fallback камер нээгдлээ)";
+        } catch (fallbackErr) {
+          statusDiv.style.color = "red";
+          statusDiv.innerText = "❌ Алдаа: " + fallbackErr.name + " - " + fallbackErr.message;
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>
