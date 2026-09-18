@@ -3,30 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSU Drink - QR Scanner Debug</title>
+  <title>CSU Drink - QR Scanner</title>
+  <!-- HTML5 QR Code Library -->
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; }
-    .card { max-width: 450px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .card { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     #reader { width: 100%; margin: 15px auto; border-radius: 8px; overflow: hidden; }
     input[type="text"] { width: 90%; padding: 12px; margin: 10px 0; font-size: 16px; border: 2px solid #ddd; border-radius: 6px; text-align: center; font-weight: bold; }
     .btn-scan { padding: 12px 24px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-bottom: 10px; }
     .btn-give { padding: 12px 24px; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
     .btn-give:disabled { background: #ccc; cursor: not-allowed; }
     #status { margin-top: 15px; font-weight: bold; font-size: 16px; min-height: 24px; word-break: break-all; }
-    
-    /* Debug & HTML Output хэсэг */
-    #debugContainer { margin-top: 20px; text-align: left; background: #222; color: #00ff00; padding: 12px; border-radius: 8px; display: none; }
-    #debugContainer h4 { margin: 0 0 8px 0; color: #fff; font-size: 14px; border-bottom: 1px solid #444; padding-bottom: 4px; }
-    #debugOutput { white-space: pre-wrap; word-break: break-all; font-family: monospace; font-size: 12px; max-height: 250px; overflow-y: auto; margin: 0; }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h2>🥤 Уух юм олгох (Debug)</h2>
+    <h2>🥤 Уух юм олгох</h2>
     
-    <button class="btn-scan" onclick="startScan()">📷 Камер нээх / Уншуулах</button>
+    <button class="btn-scan" onclick="startScan()">📷 Камер нээх / Уншуулах100</button>
     <div id="reader"></div>
 
     <label style="display:block; text-align:left; margin-top:10px; font-size:14px; color:#666;">Хэрэглэгчийн ID / Текст:</label>
@@ -35,81 +31,89 @@
     <button id="giveBtn" class="btn-give" onclick="giveDrink()" disabled>+1 Уух юм олгох</button>
 
     <div id="status"></div>
-
-    <!-- Ирсэн бүх HTML эсвэл алдааны эхийг хэвлэх хэсэг -->
-    <div id="debugContainer">
-      <h4>🔍 Ирсэн сервер / HTML хариу (Raw Output):</h4>
-      <pre id="debugOutput"></pre>
-    </div>
   </div>
 
   <script>
     let html5QrCode;
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzK5s1WP_VaP6qxw6wcBiLRwY0Fq5DmWb549AZjkLScHdLnWDuQHSJhSPDmeZKUqct4iw/exec"; // Та өөрийн бүрэн Web App URL-аа тавиарай
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzK5s1WP_VaP6qxw6wcBiLRwY0Fq5DmWb549AZjkLScHdLnWDuQHSJhSPDmeZKUqct4iw/exec"; 
 
-    function startScan() {
+function startScan() {
+  const statusDiv = document.getElementById('status');
+  statusDiv.style.color = "#333";
+  statusDiv.innerText = "Камер нээж байна...";
+
+  if (!html5QrCode) {
+    html5QrCode = new Html5Qrcode("reader");
+  }
+
+  html5QrCode.start(
+    { facingMode: "environment" }, 
+    { fps: 15, qrbox: { width: 250, height: 250 } }, 
+    async (decodedText) => {
+      // 1. Уншсан ID-г Textbox дээр харуулна
+      document.getElementById('userIdInput').value = decodedText;
+      html5QrCode.stop();
+
+      // 2. Google Sheet-ээс шалгана
+      statusDiv.style.color = "#007bff";
+      statusDiv.innerText = "⏳ Google Sheet-ээс ID шалгаж байна...";
+
+      try {
+        //const response = await fetch(`${GOOGLE_SCRIPT_URL}?id=${encodeURIComponent(decodedText)}`);
+		const response = await fetch(`${GOOGLE_SCRIPT_URL}?id=${encodeURIComponent(decodedText)}`, {
+    redirect: "follow"
+  });
+	
+        const result = await response.json();
+
+        if (result.exists) {
+          statusDiv.style.color = "#28a745";
+          statusDiv.innerText = "✅ Google Sheet дээр ID олдлоо!";
+          document.getElementById('giveBtn').disabled = false; // Товчийг идэвхжүүлнэ
+        } else {
+          statusDiv.style.color = "red";
+          statusDiv.innerText = "❌ Ийм ID-тай хэрэглэгч Google Sheet дээр олдсонгүй!";
+          document.getElementById('giveBtn').disabled = true;
+        }
+      } catch (err) {
+        statusDiv.style.color = "red";
+        statusDiv.innerText = "❌ Дата шалгахад алдаа гарлаа: " + err;
+      }
+    }
+  );
+}
+    function startScan123() {
       const statusDiv = document.getElementById('status');
-      const debugContainer = document.getElementById('debugContainer');
-      const debugOutput = document.getElementById('debugOutput');
-
       statusDiv.style.color = "#333";
       statusDiv.innerText = "Камер нээж байна...";
-      debugContainer.style.display = "none";
-      debugOutput.innerText = "";
 
       if (!html5QrCode) {
         html5QrCode = new Html5Qrcode("reader");
       }
 
-      const config = { fps: 15, qrbox: { width: 250, height: 250 } };
+      const config = { 
+        fps: 15, 
+        qrbox: { width: 250, height: 250 }
+      };
 
       html5QrCode.start(
         { facingMode: "environment" }, 
         config, 
-        async (decodedText) => {
+        (decodedText) => {
+          // 1. Уншсан утгыг Textbox дотор оруулах
           document.getElementById('userIdInput').value = decodedText;
-          html5QrCode.stop();
+          
+          // 2. Олгох товчийг идэвхтэй болгох
+          document.getElementById('giveBtn').disabled = false;
 
           statusDiv.style.color = "#007bff";
-          statusDiv.innerText = "⏳ Google Sheet-ээс ID шалгаж байна...";
+          statusDiv.innerText = "🔍 QR уншигдлаа! Текстбокс дээр шалгаад олгоно уу.";
 
-          try {
-            const response = await fetch(`${GOOGLE_SCRIPT_URL}?id=${encodeURIComponent(decodedText)}`, {
-              method: "GET",
-              redirect: "follow"
-            });
-
-            // Текстийг эхлээд түүхийгээр нь (raw text) авна
-            const rawText = await response.text();
-
-            // Дэлгэц дээр ирсэн хариуг шууд хэвлэх
-            debugContainer.style.display = "block";
-            debugOutput.innerText = rawText;
-
-            // JSON parse хийхийг турших
-            try {
-              const result = JSON.parse(rawText);
-
-              if (result.exists) {
-                statusDiv.style.color = "#28a745";
-                statusDiv.innerText = "✅ Google Sheet дээр ID олдлоо!";
-                document.getElementById('giveBtn').disabled = false;
-              } else {
-                statusDiv.style.color = "red";
-                statusDiv.innerText = "❌ Ийм ID-тай хэрэглэгч Google Sheet дээр олдсонгүй!";
-                document.getElementById('giveBtn').disabled = true;
-              }
-            } catch (jsonErr) {
-              statusDiv.style.color = "red";
-              statusDiv.innerText = "⚠️ Серверээс JSON биш HTML/Text ирсэн тул доор хэвлэлээ:";
-            }
-
-          } catch (err) {
-            statusDiv.style.color = "red";
-            statusDiv.innerText = "❌ Хүсэлт явуулахад алдаа гарлаа: " + err;
-            debugContainer.style.display = "block";
-            debugOutput.innerText = err.toString();
-          }
+          // Камерыг зогсоох
+          html5QrCode.stop();
+        },
+        (errorMessage) => {
+          // Уншиж байх үед
         }
       ).catch(err => {
         statusDiv.style.color = "red";
@@ -123,12 +127,15 @@
 
       if (!inputVal) {
         statusDiv.style.color = "red";
-        statusDiv.innerText = "⚠️ Эхлээд QR уншуулна уу!";
+        statusDiv.innerText = "⚠️ Эхлээд QR уншуулна уу эсвэл ID оруулна уу!";
         return;
       }
 
+      // Амжилттай олгосон ногоон мэдээлэл харуулах
       statusDiv.style.color = "#28a745";
       statusDiv.innerText = "✅ Амжилттай олгогдлоо! ID: " + inputVal;
+
+      // Текстбоксыг суллаж, товчийг буцаагаад олон дарахаас сэргийлж идэвхгүй болгох
       document.getElementById('userIdInput').value = "";
       document.getElementById('giveBtn').disabled = true;
     }
