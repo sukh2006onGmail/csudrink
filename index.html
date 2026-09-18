@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Camera Permission Test</title>
+
   <style>
     body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
     button { padding: 12px 24px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; }
     video { width: 100%; max-width: 400px; height: auto; margin-top: 15px; border: 2px solid #ccc; border-radius: 8px; background: #000; }
     #status { margin-top: 15px; font-weight: bold; color: #333; word-break: break-all; }
   </style>
+    <!-- Энэ санг нэмснээр видеоноос QR код унших чадвартай болно -->
+<script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
 
@@ -23,7 +26,45 @@
   <div id="status">Товч дээр дарж камерын эрхийг шалгана уу.</div>
 
   <script>
-    async function startCamera() {
+  let html5QrCode;
+  
+  function startCamera() {
+  const statusDiv = document.getElementById('status');
+  statusDiv.style.color = "#333";
+  statusDiv.innerText = "Камер нээж байна...";
+
+  // html5QrCode объектыг үүсгэх
+  if (!html5QrCode) {
+    html5QrCode = new Html5Qrcode("reader");
+  }
+
+  const config = { 
+    fps: 15, 
+    qrbox: { width: 250, height: 250 }
+  };
+
+  // Арын камераар QR уншуулж эхлэх
+  html5QrCode.start(
+    { facingMode: "environment" }, 
+    config, 
+    (decodedText) => {
+      // QR код оронгуут энд ажиллана
+      statusDiv.style.color = "green";
+      statusDiv.innerText = "✅ Амжилттай уншлаа: " + decodedText;
+      html5QrCode.stop(); // Уншсаны дараа камерийг зогсооно
+    },
+    (errorMessage) => {
+      // Хайж байх үеийн лог
+    }
+  ).catch(err => {
+    statusDiv.style.color = "red";
+    statusDiv.innerText = "❌ Алдаа: " + err;
+  });
+}
+
+
+  
+    async function startCamera_v1_ok() {
       const statusDiv = document.getElementById('status');
       const video = document.getElementById('video');
       statusDiv.innerText = "Камер руу хандаж байна...";
