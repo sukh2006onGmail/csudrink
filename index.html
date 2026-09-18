@@ -3,95 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camera Permission Test</title>
-
+  <title>CSU Drink - QR Scanner</title>
+  <!-- HTML5 QR Code Library -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
-    button { padding: 12px 24px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    video { width: 100%; max-width: 400px; height: auto; margin-top: 15px; border: 2px solid #ccc; border-radius: 8px; background: #000; }
-    #status { margin-top: 15px; font-weight: bold; color: #333; word-break: break-all; }
+    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; }
+    .card { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    #reader { width: 100%; margin: 15px auto; border-radius: 8px; overflow: hidden; }
+    input[type="text"] { width: 90%; padding: 12px; margin: 10px 0; font-size: 16px; border: 2px solid #ddd; border-radius: 6px; text-align: center; font-weight: bold; }
+    .btn-scan { padding: 12px 24px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+    .btn-give { padding: 12px 24px; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
+    .btn-give:disabled { background: #ccc; cursor: not-allowed; }
+    #status { margin-top: 15px; font-weight: bold; font-size: 16px; min-height: 24px; word-break: break-all; }
   </style>
-    <!-- Энэ санг нэмснээр видеоноос QR код унших чадвартай болно -->
-<script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
 
-  <h2>📷 Камерын Зөвшөөрөл Шалгагч</h2>
-  <button onclick="startCamera()">Камер нээх</button>
-  <!--
-  <div>
-    <video id="video" autoplay playsinline></video>
+  <div class="card">
+    <h2>🥤 Уух юм олгох</h2>
+    
+    <button class="btn-scan" onclick="startScan()">📷 Камер нээх / Уншуулах100</button>
+    <div id="reader"></div>
+
+    <label style="display:block; text-align:left; margin-top:10px; font-size:14px; color:#666;">Хэрэглэгчийн ID / Текст:</label>
+    <input type="text" id="userIdInput" placeholder="QR уншуулахад энд гарч ирнэ" />
+
+    <button id="giveBtn" class="btn-give" onclick="giveDrink()" disabled>+1 Уух юм олгох</button>
+
+    <div id="status"></div>
   </div>
-  -->
-  <div id="reader" style="width: 100%; max-width: 400px; margin: 15px auto;"></div>
-  
-  <div id="status">Товч дээр дарж камерын эрхийг шалгана уу.</div>
 
   <script>
-  let html5QrCode;
-  
-  function startCamera() {
-  const statusDiv = document.getElementById('status');
-  statusDiv.style.color = "#333";
-  statusDiv.innerText = "Камер нээж байна...";
+    let html5QrCode;
 
-  // html5QrCode объектыг үүсгэх
-  if (!html5QrCode) {
-    html5QrCode = new Html5Qrcode("reader");
-  }
-
-  const config = { 
-    fps: 15, 
-    qrbox: { width: 250, height: 250 }
-  };
-
-  // Арын камераар QR уншуулж эхлэх
-  html5QrCode.start(
-    { facingMode: "environment" }, 
-    config, 
-    (decodedText) => {
-      // QR код оронгуут энд ажиллана
-      statusDiv.style.color = "green";
-      statusDiv.innerText = "✅ Амжилттай уншлаа: " + decodedText;
-      html5QrCode.stop(); // Уншсаны дараа камерийг зогсооно
-    },
-    (errorMessage) => {
-      // Хайж байх үеийн лог
-    }
-  ).catch(err => {
-    statusDiv.style.color = "red";
-    statusDiv.innerText = "❌ Алдаа: " + err;
-  });
-}
-
-
-  
-    async function startCamera_v1_ok() {
+    function startScan() {
       const statusDiv = document.getElementById('status');
-      const video = document.getElementById('video');
-      statusDiv.innerText = "Камер руу хандаж байна...";
+      statusDiv.style.color = "#333";
+      statusDiv.innerText = "Камер нээж байна...";
 
-      try {
-        // Браузерын MediaDevices API ашиглан арын камерыг шаардах
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { exact: "environment" } }
-        });
-        video.srcObject = stream;
-        statusDiv.style.color = "green";
-        statusDiv.innerText = "✅ Амжилттай! Камер зөвшөөрөгдөж, ажиллаж байна.";
-      } catch (err) {
-        console.warn("Exact environment camera failed, fallbacking...", err);
-        try {
-          // Арын камер олдохгүй бол ердийн замаар камер шаардах
-          const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
-          video.srcObject = fallbackStream;
-          statusDiv.style.color = "green";
-          statusDiv.innerText = "✅ Амжилттай! (Fallback камер нээгдлээ)";
-        } catch (fallbackErr) {
-          statusDiv.style.color = "red";
-          statusDiv.innerText = "❌ Алдаа: " + fallbackErr.name + " - " + fallbackErr.message;
-        }
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
       }
+
+      const config = { 
+        fps: 15, 
+        qrbox: { width: 250, height: 250 }
+      };
+
+      html5QrCode.start(
+        { facingMode: "environment" }, 
+        config, 
+        (decodedText) => {
+          // 1. Уншсан утгыг Textbox дотор оруулах
+          document.getElementById('userIdInput').value = decodedText;
+          
+          // 2. Олгох товчийг идэвхтэй болгох
+          document.getElementById('giveBtn').disabled = false;
+
+          statusDiv.style.color = "#007bff";
+          statusDiv.innerText = "🔍 QR уншигдлаа! Текстбокс дээр шалгаад олгоно уу.";
+
+          // Камерыг зогсоох
+          html5QrCode.stop();
+        },
+        (errorMessage) => {
+          // Уншиж байх үед
+        }
+      ).catch(err => {
+        statusDiv.style.color = "red";
+        statusDiv.innerText = "❌ Алдаа: " + err;
+      });
+    }
+
+    function giveDrink() {
+      const inputVal = document.getElementById('userIdInput').value;
+      const statusDiv = document.getElementById('status');
+
+      if (!inputVal) {
+        statusDiv.style.color = "red";
+        statusDiv.innerText = "⚠️ Эхлээд QR уншуулна уу эсвэл ID оруулна уу!";
+        return;
+      }
+
+      // Амжилттай олгосон ногоон мэдээлэл харуулах
+      statusDiv.style.color = "#28a745";
+      statusDiv.innerText = "✅ Амжилттай олгогдлоо! ID: " + inputVal;
+
+      // Текстбоксыг суллаж, товчийг буцаагаад олон дарахаас сэргийлж идэвхгүй болгох
+      document.getElementById('userIdInput').value = "";
+      document.getElementById('giveBtn').disabled = true;
     }
   </script>
 
