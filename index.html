@@ -31,12 +31,16 @@
     <button id="giveBtn" class="btn-give" onclick="giveDrink()" disabled>+1 Уух юм олгох</button>
 
     <div id="status"></div>
+	
+	<div id="debugContainer">
+      <h4>🔍 Ирсэн сервер / HTML хариу (Raw Output):</h4>
+      <pre id="debugOutput"></pre>
+    </div>
+	
   </div>
 
   <script>
     let html5QrCode;
-
-   // Дээр авсан Google Web App URL-аа энд орлуулж тавина
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzK5s1WP_VaP6qxw6wcBiLRwY0Fq5DmWb549AZjkLScHdLnWDuQHSJhSPDmeZKUqct4iw/exec"; 
 
 function startScan() {
@@ -80,6 +84,7 @@ function startScan() {
     }
   );
 }
+
   </script>
 
 </body>
