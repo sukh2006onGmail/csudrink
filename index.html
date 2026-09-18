@@ -59,7 +59,11 @@ function startScan() {
       statusDiv.innerText = "⏳ Google Sheet-ээс ID шалгаж байна...";
 
       try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?id=${encodeURIComponent(decodedText)}`);
+        //const response = await fetch(`${GOOGLE_SCRIPT_URL}?id=${encodeURIComponent(decodedText)}`);
+		const response = await fetch(`${GOOGLE_SCRIPT_URL}?id=${encodeURIComponent(decodedText)}`, {
+    redirect: "follow"
+  });
+	
         const result = await response.json();
 
         if (result.exists) {
