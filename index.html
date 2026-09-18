@@ -3,232 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSU Drink Manager</title>
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <title>CSU Drink Claim</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; }
-    .card { max-width: 420px; margin: 0 auto; background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); position: relative; }
-    #reader { width: 100%; margin: 15px auto; border-radius: 10px; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; background: #f0f2f5; color: #333; }
+    .card { max-width: 380px; margin: 20px auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
     
-    .input-group { margin: 15px 0; text-align: left; }
-    .input-group label { font-size: 13px; color: #666; font-weight: 600; display: block; margin-bottom: 6px; }
-    input[type="text"] { width: 92%; padding: 12px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 8px; text-align: center; outline: none; transition: border 0.2s; }
-    input[type="text"]:focus { border-color: #007bff; }
+    .input-group { margin: 20px 0; text-align: left; }
+    .input-group label { font-size: 14px; color: #555; font-weight: bold; display: block; margin-bottom: 8px; }
     
-    .btn { padding: 12px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 10px; transition: opacity 0.2s; }
-    .btn:active { opacity: 0.8; }
-    .btn-scan { background: #007bff; color: white; }
-    .btn-search { background: #17a2b8; color: white; }
-    .btn-give { background: #28a745; color: white; margin-top: 10px; }
-    .btn-give:disabled { background: #cbd5e1; cursor: not-allowed; }
-    
-    #userCard { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; display: none; }
-    #userCard p { margin: 6px 0; font-size: 15px; }
-    .count-badge { font-weight: bold; font-size: 18px; padding: 2px 8px; border-radius: 6px; }
-    .count-ok { color: #28a745; }
-    .count-limit { color: #dc3545; background: #ffe8e6; }
-    
-    #status { margin-top: 15px; font-weight: bold; font-size: 15px; word-break: break-all; min-height: 22px; }
-
-    /* --- 3 секундийн дараа арилдаг Toast Alert --- */
-    #toast {
-      visibility: hidden;
-      min-width: 280px;
-      background-color: #28a745;
-      color: #fff;
+    input[type="number"] {
+      width: 93%;
+      padding: 14px;
+      font-size: 20px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
       text-align: center;
-      border-radius: 8px;
-      padding: 14px 20px;
-      position: fixed;
-      z-index: 1000;
-      left: 50%;
-      top: 30px;
-      transform: translateX(-50%);
+      letter-spacing: 2px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input[type="number"]:focus { border-color: #007bff; }
+
+    .btn-claim {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-claim:active { opacity: 0.8; }
+    .btn-claim:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    /* Зөөгчид харуулах Анимейшнтэй Ногоон Баннер */
+    #successBanner {
+      display: none;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 22px;
+      border-radius: 16px;
+      margin-top: 15px;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 10px rgba(40,167,69,0.4); }
+      100% { transform: scale(1.02); box-shadow: 0 0 25px rgba(40,167,69,0.8); }
+    }
+
+    .banner-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
+    .user-name { font-size: 22px; font-weight: 800; margin: 5px 0; }
+    .live-clock { font-size: 26px; font-weight: 800; background: rgba(0,0,0,0.18); padding: 8px 15px; border-radius: 10px; display: inline-block; margin: 12px 0; letter-spacing: 1px; }
+
+    /* Toast / Алдааны мэдээлэл */
+    #errorBox {
+      display: none;
+      background: #dc3545;
+      color: white;
+      padding: 14px;
+      border-radius: 12px;
+      margin-top: 15px;
       font-size: 15px;
       font-weight: bold;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
-      opacity: 0;
-      transition: opacity 0.4s ease-in-out, top 0.4s ease-in-out;
     }
-
-    #toast.show {
-      visibility: visible;
-      opacity: 1;
-      top: 50px;
-    }
-
-    #toast.error { background-color: #dc3545; }
-    #toast.warning { background-color: #ffc107; color: #333; }
   </style>
 </head>
 <body>
 
-  <!-- Toast мэдээллийн цонх -->
-  <div id="toast"></div>
-
   <div class="card">
-    <h2>🥤 CSU Уух зүйлийн бүртгэл</h2>
-    
-    <button class="btn btn-scan" onclick="startScan()">📷 QR Камер нээх</button>
-    <div id="reader"></div>
+    <h2>🥤 CSU Уух зүйл авах</h2>
+    <p style="color: #666; font-size: 14px;">Бүртгэлтэй утасны дугаараа оруулна уу.</p>
 
-    <div class="input-group">
-      <label>ID эсвэл Нэрээр хайх:</label>
-      <input type="text" id="searchInput" placeholder="Жишээ: 1 эсвэл Participant" onkeypress="if(event.key==='Enter') searchUser()" />
+    <div id="formSection">
+      <div class="input-group">
+        <label for="phoneInput">Утасны дугаар:</label>
+        <input type="number" id="phoneInput" placeholder="88112233" pattern="[0-9]*" onkeypress="if(event.key==='Enter') claimDrink()" />
+      </div>
+
+      <button class="btn-claim" id="claimBtn" onclick="claimDrink()">🥤 Уух юм авах (+1)</button>
     </div>
 
-    <button class="btn btn-search" onclick="searchUser()">🔍 Хайх</button>
-
-    <!-- Олдсон сурагчийн мэдээлэл -->
-    <div id="userCard">
-      <p><b>ID:</b> <span id="resId">-</span></p>
-      <p><b>Нэр:</b> <span id="resName">-</span></p>
-      <p><b>Авсан уух зүйл:</b> <span id="resCount" class="count-badge">0</span>/5</p>
+    <!-- ЗӨӨГЧИД ХАРУУЛАХ БАННЕР -->
+    <div id="successBanner">
+      <div class="banner-title">✅ УУХ ЮМ ОЛГОНО УУ</div>
+      <div class="user-name" id="bannerName">-</div>
+      <div class="live-clock" id="liveClock">00:00:00</div>
+      <div style="font-size: 14px;">Нийт авсан: <b id="bannerCount">0</b>/5</div>
     </div>
 
-    <button id="giveBtn" class="btn btn-give" onclick="giveDrink()" disabled>+1 Уух юм олгох</button>
-
-    <div id="status"></div>
+    <div id="errorBox"></div>
   </div>
 
   <script>
-    let html5QrCode;
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby48AGGTzygrb0kCK6yVxtET7RB4y5d0q6G8IgEL7VZuTzSNMNlBvqArNtH5tn8GOXAeg/exec"; 
+    // Та өөрийн Apps Script-ийн URL хаягийг заавал солиорой!
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby48AGGTzygrb0kCK6yVxtET7RB4y5d0q6G8IgEL7VZuTzSNMNlBvqArNtH5tn8GOXAeg/exec";
 
-    let currentUser = null;
-    let toastTimer = null;
+    async function claimDrink() {
+      const phoneInput = document.getElementById('phoneInput');
+      const phone = phoneInput.value.trim();
+      const claimBtn = document.getElementById('claimBtn');
+      const errorBox = document.getElementById('errorBox');
 
-    // 3 СЕКУНД ИЛ ГАРЧ АРИЛДАГ ALERT FUNCTION
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById("toast");
-      toast.innerText = message;
-      toast.className = "show " + type;
+      errorBox.style.display = 'none';
 
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.className = toast.className.replace("show", "");
-      }, 3000); // 3 секундийн дараа арилна
-    }
-
-    // 1. QR КАМЕР
-    function startScan() {
-      resetUI();
-      showStatus("Камер нээж байна...", "#333");
-
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader");
-      }
-
-      html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 15, qrbox: { width: 250, height: 250 } }, 
-        (decodedText) => {
-          document.getElementById('searchInput').value = decodedText;
-          html5QrCode.stop();
-          searchUser();
-        }
-      ).catch(err => {
-        showStatus("❌ Алдаа: " + err, "red");
-      });
-    }
-
-    // 2. ХАЙЛТ (ID эсвэл Нэрээр)
-    async function searchUser() {
-      const query = document.getElementById('searchInput').value.trim();
-      if (!query) {
-        showToast("⚠️ ID эсвэл Нэрээ оруулна уу!", "warning");
+      if (!phone || phone.length < 8) {
+        showError("⚠️ Зөв утасны дугаар оруулна уу!");
         return;
       }
 
-      showStatus("⏳ Google Sheet-ээс хайж байна...", "#007bff");
+      claimBtn.disabled = true;
+      claimBtn.innerText = "⏳ Шалгаж байна...";
 
       try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?id=${encodeURIComponent(query)}`, { redirect: "follow" });
-        const result = await response.json();
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=claim&phone=${encodeURIComponent(phone)}`, { redirect: "follow" });
+        const data = await response.json();
 
-        if (result.exists) {
-          currentUser = result.data;
-          displayUser(currentUser);
-          showStatus("✅ Хэрэглэгч олдлоо!", "#28a745");
-          showToast(`✅ ${currentUser.name} олдлоо!`, "success");
+        if (data.success) {
+          // Формыг нууж, амжилттай баннерыг харуулна
+          document.getElementById('formSection').style.display = 'none';
+          document.getElementById('bannerName').innerText = data.name;
+          document.getElementById('bannerCount').innerText = data.drinkCount;
+          document.getElementById('successBanner').style.display = 'block';
+
+          // Дэлгэцийн зураг авч ашиглахаас сэргийлж цагийг секунд бүр гүйгээр тохируулна
+          updateClock();
+          setInterval(updateClock, 1000);
+
         } else {
-          resetUI();
-          showStatus("❌ Хэрэглэгч олдсонгүй!", "red");
-          showToast("❌ Ийм хэрэглэгч олдсонгүй!", "error");
+          showError("❌ " + data.message);
+          claimBtn.disabled = false;
+          claimBtn.innerText = "🥤 Уух юм авах (+1)";
         }
       } catch (err) {
-        showStatus("❌ Холболтын алдаа: " + err, "red");
-        showToast("❌ Сүлжээний алдаа гарлаа!", "error");
+        showError("❌ Холболтын алдаа гарлаа! Дахин туршина уу.");
+        claimBtn.disabled = false;
+        claimBtn.innerText = "🥤 Уух юм авах (+1)";
       }
     }
 
-    // 3. УУХ ЮМ ОЛГОХ (+1)
-    async function giveDrink() {
-      if (!currentUser) return;
-
-      if (currentUser.drinkCount >= 5) {
-        showToast(`⚠️ Лимит дууссан! (${currentUser.drinkCount}/5)`, "error");
-        return;
-      }
-
-      const giveBtn = document.getElementById('giveBtn');
-      giveBtn.disabled = true;
-      showStatus("⏳ Баазад хадгалж байна...", "#007bff");
-
-      try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=drink&id=${encodeURIComponent(currentUser.id)}`, { redirect: "follow" });
-        const result = await response.json();
-
-        if (result.success) {
-          currentUser.drinkCount = result.drinkCount;
-          displayUser(currentUser);
-          showStatus(`✅ Амжилттай олгогдлоо! (Нийт: ${currentUser.drinkCount})`, "#28a745");
-          showToast(`🎉 Амжилттай! ${currentUser.name}-д олгогдлоо. (${currentUser.drinkCount}/5)`, "success");
-        } else {
-          showStatus("❌ " + result.message, "red");
-          showToast(`⚠️ ${result.message}`, "error");
-          if (result.drinkCount !== undefined) {
-            currentUser.drinkCount = result.drinkCount;
-            displayUser(currentUser);
-          }
-        }
-      } catch (err) {
-        showStatus("❌ Алдаа гарлаа: " + err, "red");
-        showToast("❌ Сервертэй холбогдож чадсангүй!", "error");
-        giveBtn.disabled = false;
-      }
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('mn-MN', { hour12: false });
+      document.getElementById('liveClock').innerText = timeStr;
     }
 
-    function displayUser(user) {
-      document.getElementById('resId').innerText = user.id;
-      document.getElementById('resName').innerText = user.name;
-      
-      const countEl = document.getElementById('resCount');
-      countEl.innerText = user.drinkCount;
-
-      if (user.drinkCount >= 5) {
-        countEl.className = "count-badge count-limit";
-        document.getElementById('giveBtn').disabled = true;
-        showToast(`⚠️ ${user.name} сурагчийн лимит (5/5) дууссан байна!`, "error");
-      } else {
-        countEl.className = "count-badge count-ok";
-        document.getElementById('giveBtn').disabled = false;
-      }
-
-      document.getElementById('userCard').style.display = "block";
-    }
-
-    function resetUI() {
-      currentUser = null;
-      document.getElementById('userCard').style.display = "none";
-      document.getElementById('giveBtn').disabled = true;
-      document.getElementById('status').innerText = "";
-    }
-
-    function showStatus(text, color) {
-      const statusDiv = document.getElementById('status');
-      statusDiv.style.color = color;
-      statusDiv.innerText = text;
+    function showError(msg) {
+      const err = document.getElementById('errorBox');
+      err.innerText = msg;
+      err.style.display = 'block';
     }
   </script>
 
