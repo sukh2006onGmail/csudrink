@@ -192,7 +192,10 @@
             //showError("❌ You have already claimed the maximum number of drinks (5).");
             claimBtn.disabled = true;
             claimBtn.innerText = "🥤 Claim Drink (+1)";
-          } 
+          } else {
+            claimBtn.disabled = false;
+            claimBtn.innerText = "🥤 Claim Drink (+1)";
+          }
           
 
         } else {
