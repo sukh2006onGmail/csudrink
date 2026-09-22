@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="mn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSU Drink Claim</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; background: #f0f2f5; color: #333; }
+    .hero-image { width: min(100%, 760px); height: 220px; margin: 0 auto 20px; object-fit: cover; object-position: center; display: block; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
     .card { max-width: 380px; margin: 20px auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
     
     .input-group { margin: 20px 0; text-align: left; }
@@ -39,8 +40,8 @@
     .btn-claim:active { opacity: 0.8; }
     .btn-claim:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    /* Зөөгчид харуулах Анимейшнтэй Ногоон Баннер */
-    #successBanner {
+    /* Animated green banner shown to the server */
+    .successBanner {
       display: none;
       background: linear-gradient(135deg, #28a745, #20c997);
       color: white;
@@ -59,48 +60,105 @@
     .user-name { font-size: 22px; font-weight: 800; margin: 5px 0; }
     .live-clock { font-size: 26px; font-weight: 800; background: rgba(0,0,0,0.18); padding: 8px 15px; border-radius: 10px; display: inline-block; margin: 12px 0; letter-spacing: 1px; }
 
-    /* Toast / Алдааны мэдээлэл */
+    /* Toast / error message */
     #errorBox {
       display: none;
-      background: #dc3545;
-      color: white;
-      padding: 14px;
-      border-radius: 12px;
-      margin-top: 15px;
-      font-size: 15px;
-      font-weight: bold;
+      background: #fff8ed;
+      color: #7a3e12;
+      padding: 13px 16px;
+      border: 1px solid #f2c892;
+      border-left: 4px solid #e38a2d;
+      border-radius: 10px;
+      margin-top: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.45;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(126, 73, 20, 0.08);
     }
   </style>
 </head>
 <body>
 
+  
+
   <div class="card">
-    <h2>🥤 CSU Уух зүйл авах</h2>
-    <p style="color: #666; font-size: 14px;">Бүртгэлтэй утасны дугаараа оруулна уу.</p>
+    
+    
 
     <div id="formSection">
       <div class="input-group">
-        <label for="phoneInput">Утасны дугаар:</label>
-        <input type="number" id="phoneInput" placeholder="88112233" pattern="[0-9]*" onkeypress="if(event.key==='Enter') claimDrink()" />
+        <img class="hero-image" src="Oirkhon_small.jpg" alt="Oirkhon travel destination">
+        <h2>2026 Staff Fall Camping</h2>
+        <label for="phoneInput">Enter your registered phone number.</label>
+        <input type="number" id="phoneInput" placeholder="________" pattern="[0-9]*" onkeypress="if(event.key==='Enter') checkStaff()" />
       </div>
 
-      <button class="btn-claim" id="claimBtn" onclick="claimDrink()">🥤 Уух юм авах (+1)</button>
+      <button class="btn-claim" id="checkBtn" onclick="checkStaff()">Check phone number</button>
+      <div id="errorBox"></div>
+
+
+        <div id="infoBanner" class="successBanner">
+      <div class="banner-title" id="buss_number"></div>
+      <div class="user-name" id="bannerName1">-</div>
+      <div class="user-name" id="bannerLname1">-</div>
+      <div style="font-size: 14px;">Drinks claimed: <b id="bannerCount1">0</b>/5</div>
     </div>
 
-    <!-- ЗӨӨГЧИД ХАРУУЛАХ БАННЕР -->
-    <div id="successBanner">
-      <div class="banner-title">✅ УУХ ЮМ ОЛГОНО УУ</div>
+      <button class="btn-claim" id="claimBtn" onclick="claimDrink()" style="display: none;">🥤 Claim Drink (+1)</button>
+                <!-- BANNER FOR THE SERVER -->
+    <div id="successBanner" class="successBanner">
+      <div class="banner-title">✅ PLEASE PROVIDE THE DRINK</div>
       <div class="user-name" id="bannerName">-</div>
-      <div class="live-clock" id="liveClock">00:00:00</div>
-      <div style="font-size: 14px;">Нийт авсан: <b id="bannerCount">0</b>/5</div>
+      <div class="user-name" id="bannerLname">-</div>
+      <div style="font-size: 14px;">Drinks claimed: <b id="bannerCount">0</b>/5</div>
+    </div>
+    
     </div>
 
-    <div id="errorBox"></div>
+
+
+    
   </div>
 
   <script>
-    // Та өөрийн Apps Script-ийн URL хаягийг заавал солиорой!
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby48AGGTzygrb0kCK6yVxtET7RB4y5d0q6G8IgEL7VZuTzSNMNlBvqArNtH5tn8GOXAeg/exec";
+    // Replace this with your own Apps Script URL.
+    // const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby48AGGTzygrb0kCK6yVxtET7RB4y5d0q6G8IgEL7VZuTzSNMNlBvqArNtH5tn8GOXAeg/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1xmPvPE5BzXJ7zyNHfrN1XFkXDnTOpTAY6RDN4LNz5nWDhCO2KDTwgQHiGZMwdDw-OQ/exec";
+
+    async function checkStaff() {
+      const phone = phoneInput.value.trim();
+      if (!phone || phone.length < 8) {
+                showError("⚠️ Please enter a valid phone number!");
+                return;
+      }
+
+       try {
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=check&phone=${encodeURIComponent(phone)}`, { redirect: "follow" });
+        const data = await response.json();
+
+        if (data.success) {
+          // Hide the form and show the success banner.
+          //document.getElementById('formSection').style.display = 'none';
+          document.getElementById('buss_number').innerText = `Your bus number is #${data.bus}`;
+          document.getElementById('bannerName1').innerText = data.name;
+          document.getElementById('bannerLname1').innerText = data.lname;
+          document.getElementById('bannerCount1').innerText = data.drinkCount;
+          document.getElementById('infoBanner').style.display = 'block';
+
+          const claimBtn = document.getElementById('claimBtn');
+          claimBtn.style.display = 'block';
+
+
+
+        } else {
+          showError("❌ " + data.message);
+        }
+      } catch (err) {
+        showError("❌ Connection error! Please try again.");
+      }
+
+    }
 
     async function claimDrink() {
       const phoneInput = document.getElementById('phoneInput');
@@ -110,46 +168,46 @@
 
       errorBox.style.display = 'none';
 
-      if (!phone || phone.length < 8) {
-        showError("⚠️ Зөв утасны дугаар оруулна уу!");
-        return;
-      }
+      
 
       claimBtn.disabled = true;
-      claimBtn.innerText = "⏳ Шалгаж байна...";
+      claimBtn.innerText = "⏳ Checking...";
 
       try {
         const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=claim&phone=${encodeURIComponent(phone)}`, { redirect: "follow" });
         const data = await response.json();
 
         if (data.success) {
-          // Формыг нууж, амжилттай баннерыг харуулна
-          document.getElementById('formSection').style.display = 'none';
-          document.getElementById('bannerName').innerText = data.name;
-          document.getElementById('bannerCount').innerText = data.drinkCount;
-          document.getElementById('successBanner').style.display = 'block';
+          // Hide the form and show the success banner.
+          //document.getElementById('formSection').style.display = 'none';
+          // document.getElementById('bannerName').innerText = data.name;
+          document.getElementById('bannerCount1').innerText = data.drinkCount;
+          // document.getElementById('successBanner').style.display = 'block';
 
-          // Дэлгэцийн зураг авч ашиглахаас сэргийлж цагийг секунд бүр гүйгээр тохируулна
-          updateClock();
-          setInterval(updateClock, 1000);
+          // Update the clock every second to prevent screenshot reuse.
+          // updateClock();
+          // setInterval(updateClock, 1000);
+
+          if (data.drinkCount >= 5) {
+            //showError("❌ You have already claimed the maximum number of drinks (5).");
+            claimBtn.disabled = true;
+            claimBtn.innerText = "🥤 Claim Drink (+1)";
+          } 
+          
 
         } else {
           showError("❌ " + data.message);
           claimBtn.disabled = false;
-          claimBtn.innerText = "🥤 Уух юм авах (+1)";
+          claimBtn.innerText = "🥤 Claim Drink (+1)";
         }
       } catch (err) {
-        showError("❌ Холболтын алдаа гарлаа! Дахин туршина уу.");
+        showError("❌ Connection error! Please try again.");
         claimBtn.disabled = false;
-        claimBtn.innerText = "🥤 Уух юм авах (+1)";
+        claimBtn.innerText = "🥤 Claim Drink (+1)";
       }
     }
 
-    function updateClock() {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('mn-MN', { hour12: false });
-      document.getElementById('liveClock').innerText = timeStr;
-    }
+
 
     function showError(msg) {
       const err = document.getElementById('errorBox');
