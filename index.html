@@ -5,28 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSU Drink Claim</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; background: #f0f2f5; color: #333; }
-    .hero-image { width: min(100%, 760px); height: 220px; margin: 0 auto 20px; object-fit: cover; object-position: center; display: block; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
-    .card { max-width: 380px; margin: 20px auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 10px 16px 28px; background: #f0f2f5; color: #333; }
+    .hero-image { width: calc(100% + 48px); height: 210px; margin: 0 -24px 22px; object-fit: cover; object-position: center; display: block; }
+    .card { max-width: 430px; margin: 0 auto; background: white; padding: 0 24px 26px; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .card h2 { margin: 0 0 18px; color: #17324d; font-size: 25px; }
     
-    .input-group { margin: 20px 0; text-align: left; }
+    .input-group { margin: 0; text-align: left; }
     .input-group label { font-size: 14px; color: #555; font-weight: bold; display: block; margin-bottom: 8px; }
     
     input[type="number"] {
-      width: 93%;
+      width: 100%;
       padding: 14px;
       font-size: 20px;
       border: 2px solid #cbd5e1;
-      border-radius: 12px;
+      border-radius: 12px 12px 0 0;
       text-align: center;
       letter-spacing: 2px;
       outline: none;
       transition: border 0.2s;
+      box-sizing: border-box;
     }
     input[type="number"]:focus { border-color: #007bff; }
 
     .btn-claim {
-      background: #007bff;
+      background: #17324d;
       color: white;
       border: none;
       padding: 16px;
@@ -35,9 +37,12 @@
       border-radius: 12px;
       width: 100%;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
-    .btn-claim:active { opacity: 0.8; }
+    #checkBtn { border-radius: 0 0 12px 12px; margin-top: -2px; background: #d47745; }
+    #checkBtn:hover { background: #b85f32; }
+    #claimBtn { margin-top: 16px; }
+    .btn-claim:active { opacity: 0.8; transform: translateY(1px); }
     .btn-claim:disabled { background: #94a3b8; cursor: not-allowed; }
 
     /* Animated green banner shown to the server */
