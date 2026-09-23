@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSU Drink Claim</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     /* body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 10px 16px 28px; background: #0b8f7d; color: #333; } */
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 10px 16px 28px; background: #064b3e; color: #333; }
@@ -52,7 +53,7 @@
       display: none;
       /* background: linear-gradient(135deg, #28a745, #20c997); */
       background: linear-gradient(180deg, #16624f, #0d382d);
-      color: white;
+      color: rgba(16, 185, 129, 0.8);
       /* text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); */
       padding: 22px;
       border-radius: 16px;
@@ -133,6 +134,235 @@
   opacity: 0.85;
   cursor: pointer;
 }
+
+
+        .glow-emerald-btn {
+            width: 100%;
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            /* color: #ffffff; */
+            color: rgba(16, 185, 129, 0.8);
+            cursor: pointer;
+            outline: none;
+            text-align: center;
+            position: relative;
+            
+            /* Deep emerald gradient interior */
+            /* background: linear-gradient(180deg, #09372e 0%, #05231d 100%); */
+            
+            /* Clean thin emerald border */
+            border: 1px solid #1ba582;
+            
+            /* Outer glowing halo box shadow matching screenshot */
+            /* box-shadow: 
+                0 0 16px rgba(27, 165, 130, 0.45),
+                inset 0 1px 1px rgba(255, 255, 255, 0.25),
+                0 4px 12px rgba(0, 0, 0, 0.5); */
+                
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+            background: linear-gradient(180deg, #0c4338 0%, #072e27 100%);
+            border-color: #26cba2;
+            box-shadow: 
+                0 0 22px rgba(38, 203, 162, 0.65),
+                inset 0 1px 2px rgba(255, 255, 255, 0.35),
+                0 6px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .glow-emerald-btn:active {
+            transform: scale(0.98);
+            box-shadow: 
+                0 0 10px rgba(27, 165, 130, 0.4),
+                inset 0 1px 0 rgba(0, 0, 0, 0.2);
+        }
+
+
+
+
+
+
+                .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background-color: #010a08;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+
+        /* Mobile Screen Outer Container */
+        .modal-container {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, #062b22 0%, #031712 50%, #010a08 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        @media (min-width: 640px) {
+            .modal-container {
+                max-width: 410px;
+                height: 820px;
+                border-radius: 36px;
+                border: 1px solid rgba(16, 185, 129, 0.15);
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            }
+        }
+                /* Header Navigation Controls */
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 8px;
+            padding-bottom: 16px;
+        }
+
+
+                .nav-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 18px;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.18);
+            color: #e2e8f0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.92);
+        }
+
+                .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+               /* Body Content Area */
+        .modal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 0;
+            gap: 20px;
+        }
+
+        .scan-instruction {
+            color: #8da39c;
+            font-size: 15px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .qr-card-container {
+            width: 100%;
+            background: #041f18;
+            border: 1px solid #0a362b;
+            border-radius: 28px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* PLACEHOLDER FOR USER CUSTOM QR CODE */
+        .qr-placeholder-area {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border: 2px dashed rgba(16, 185, 129, 0.25);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            transition: border-color 0.3s ease;
+        }
+
+        .qr-placeholder-area:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .qr-placeholder-icon {
+            font-size: 48px;
+            color: rgba(16, 185, 129, 0.4);
+            margin-bottom: 12px;
+        }
+
+        .qr-placeholder-text {
+            color: rgba(16, 185, 129, 0.8);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .qr-placeholder-sub {
+            color: #617b73;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .detection-hint {
+            color: #617b73;
+            font-size: 13px;
+            text-align: center;
+            line-height: 1.5;
+            padding: 0 12px;
+        }
+
+        .modal-footer {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
   </style>
 </head>
 <body>
@@ -165,17 +395,69 @@
       
 
 
-    <div class="notched-card" id="notchched_card">
+    <!-- <div class="notched-card" id="notched_card">
       <div class="card-title-notched">Drinks claimed: </div>
       <div class="card-amount-notched">
 
       <b>0</b>/5
-    </div>
+    </div> -->
     
-    </div>
+    <!-- </div> -->
     <button class="btn-claim" id="claimBtn" onclick="claimDrink()" style="display: none;">🥤 Claim Drink (+1)</button>
+    <button id="openModalBtn" class="glow-emerald-btn" > 🥤 Claim Drink (+1) </button>
 
 
+        <div id="requestModal" class="modal-overlay">
+        
+        <!-- Mobile View Frame -->
+        <div class="modal-container">
+            
+            <!-- Top Navigation Header -->
+            <header class="modal-header">
+                <!-- Top-Left Back Close Button -->
+                <button id="closeHeaderBtn" class="nav-btn" aria-label="Go back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="header-title">Request</h2>
+                <div class="notification-wrapper">
+                    <button class="nav-btn" aria-label="Notifications">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    <span class="notification-dot"></span>
+                </div>
+            </header>
+
+            <!-- Main Body Section -->
+            <section class="modal-body">
+                <p class="scan-instruction">Scan the QR code of the device</p>
+
+                <!-- Dark Green Card Area -->
+                <div class="qr-card-container">
+                    
+                    <!-- ==================================================== -->
+                    <!-- USER QR CODE CONTAINER PLACEHOLDER                   -->
+                    <!-- Replace the div below with your custom <img> / <canvas> -->
+                    <!-- ==================================================== -->
+                    <div id="userQrContainer" class="qr-placeholder-area">
+                        <i class="fa-solid fa-qrcode qr-placeholder-icon"></i>
+                        <span class="qr-placeholder-text">QR кодоо энд байрлуулна уу</span>
+                        <span class="qr-placeholder-sub">(Paste your QR canvas or image here)</span>
+                    </div>
+
+                </div>
+
+                <p class="detection-hint">
+                    The QR code will be automatically detected when you position it between the guide lines.
+                </p>
+            </section>
+
+            <!-- Footer Area with Glowing Green Share Link Button -->
+            <footer class="modal-footer">
+                <button id="shareLinkBtn" class="glow-emerald-btn"> Claim Drink </button>
+            </footer>
+
+        </div>
+    </div>
     
   </div>
 
@@ -206,9 +488,12 @@
 
           const claimBtn = document.getElementById('claimBtn');
           claimBtn.style.display = 'block';
+          document.getElementById('openModalBtn').style.display = 'block';
 
-          const notched_card = document.getElementById('notched_card');
-          notched_card.style.display = 'block';
+   
+
+          // const notched_card = document.getElementById('notched_card');
+          // notched_card.style.display = 'block';
 
           const err = document.getElementById('errorBox');
           err.style.display = 'none';
@@ -234,6 +519,18 @@
       }
 
     }
+
+
+    const openModalBtn = document.getElementById('openModalBtn');
+    openModalBtn.addEventListener('click', openModal);
+    const requestModal = document.getElementById('requestModal');
+
+    // Open Modal Function
+    function openModal() {
+        requestModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+          
 
     async function claimDrink() {
       const phoneInput = document.getElementById('phoneInput');
