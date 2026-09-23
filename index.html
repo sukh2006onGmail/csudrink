@@ -41,7 +41,14 @@
       cursor: pointer;
       transition: background 0.2s, transform 0.2s;
     }
-    #checkBtn { border-radius: 0 0 12px 12px; margin-top: -2px; background: #0b8f7d; box-shadow: inset 0 0 0 2px rgba(64, 230, 204, 0.35); }
+    #checkBtn { border-radius: 0 0 12px 12px; margin-top: -2px; 
+      background: #0b8f7d; box-shadow: inset 0 0 0 2px rgba(64, 230, 204, 0.35); 
+
+      background: linear-gradient(180deg, #0c4338 0%, #072e27 100%);
+  border-color: #26cba2;
+  color: rgba(16, 185, 129, 0.8);
+    
+    }
     #checkBtn:hover { background: #087766; }
     /* #claimBtn { margin-top: 16px; } */
     #claimBtn { margin-top: 26px; border-radius: 12px 12px 12px 12px; margin-top: -2px; background: #0b8f7d; box-shadow: inset 0 0 0 2px rgba(64, 230, 204, 0.35); }
@@ -400,6 +407,7 @@
       </div>
 
       <button class="btn-claim" id="checkBtn" onclick="checkStaff()">Check phone number</button>
+      <!-- <button class="glow-emerald-btn" id="checkBtn" onclick="checkStaff()">Check phone number</button> -->
       <div id="errorBox"></div>
 
 
@@ -423,8 +431,8 @@
     <!-- </div> -->
     <!-- <button class="btn-claim" id="claimBtn" onclick="claimDrink()" style="display: none;">🥤 Claim Drink (+1)</button> -->
     <button class="btn-claim" id="claimBtn" onclick="claimDrink()" style="visibility: hidden;">🥤 Claim Drink (+1)</button>
-    <!-- <button id="openModalBtn" class="glow-emerald-btn" style="display: none;"> 🥤 Claim Drink (+1) </button> -->
-    <button id="openModalBtn" class="glow-emerald-btn"> 🥤 Claim Drink (+1) </button>
+    <button id="openModalBtn" class="glow-emerald-btn" style="display: none;"> 🥤 Claim Drink (+1) </button>
+    <!-- <button id="openModalBtn" class="glow-emerald-btn"> 🥤 Claim Drink (+1) </button> -->
         <div id="requestModal" class="modal-overlay">
         <div class="modal-container">
             <header class="modal-header">
