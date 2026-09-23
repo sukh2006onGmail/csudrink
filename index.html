@@ -49,8 +49,10 @@
     /* Animated green banner shown to the server */
     .successBanner {
       display: none;
-      background: linear-gradient(135deg, #28a745, #20c997);
+      /* background: linear-gradient(135deg, #28a745, #20c997); */
+      background: linear-gradient(180deg, #16624f, #0d382d);
       color: white;
+      /* text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); */
       padding: 22px;
       border-radius: 16px;
       margin-top: 15px;
@@ -62,8 +64,13 @@
       100% { transform: scale(1.02); box-shadow: 0 0 25px rgba(40,167,69,0.8); }
     }
 
-    .banner-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
-    .user-name { font-size: 22px; font-weight: 800; margin: 5px 0; }
+    .banner-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; 
+    letter-spacing: 1px; /* Үсэг хоорондын зайг арай тэлэх */
+  color: rgba(255, 255, 255, 0.75); /* Зөөлөн тунгалаг цагаан */
+    }
+    .user-name { font-size: 22px; font-weight: 800; margin: 5px 0; 
+    color: rgba(255, 255, 255, 0.75); 
+    }
     .live-clock { font-size: 26px; font-weight: 800; background: rgba(0,0,0,0.18); padding: 8px 15px; border-radius: 10px; display: inline-block; margin: 12px 0; letter-spacing: 1px; }
 
     /* Toast / error message */
@@ -154,6 +161,16 @@
 
           const claimBtn = document.getElementById('claimBtn');
           claimBtn.style.display = 'block';
+
+
+          if (data.drinkCount >= 5) {
+            //showError("❌ You have already claimed the maximum number of drinks (5).");
+            claimBtn.disabled = true;
+            claimBtn.innerText = "🥤 Claim Drink (+1)";
+          } else {
+            claimBtn.disabled = false;
+            claimBtn.innerText = "🥤 Claim Drink (+1)";
+          }
 
 
 
