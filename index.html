@@ -42,7 +42,8 @@
     }
     #checkBtn { border-radius: 0 0 12px 12px; margin-top: -2px; background: #0b8f7d; box-shadow: inset 0 0 0 2px rgba(64, 230, 204, 0.35); }
     #checkBtn:hover { background: #087766; }
-    #claimBtn { margin-top: 16px; }
+    /* #claimBtn { margin-top: 16px; } */
+    #claimBtn { margin-top: 26px; border-radius: 12px 12px 12px 12px; margin-top: -2px; background: #0b8f7d; box-shadow: inset 0 0 0 2px rgba(64, 230, 204, 0.35); }
     .btn-claim:active { opacity: 0.8; transform: translateY(1px); }
     .btn-claim:disabled { background: #94a3b8; cursor: not-allowed; }
 
@@ -64,7 +65,7 @@
       100% { transform: scale(1.02); box-shadow: 0 0 25px rgba(40,167,69,0.8); }
     }
 
-    .banner-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; 
+    .banner-title { font-size: 28px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; 
     letter-spacing: 1px; /* Үсэг хоорондын зайг арай тэлэх */
   color: rgba(255, 255, 255, 0.75); /* Зөөлөн тунгалаг цагаан */
     }
@@ -89,6 +90,49 @@
       text-align: left;
       box-shadow: 0 4px 12px rgba(126, 73, 20, 0.08);
     }
+
+    .notched-card {
+      display: none;
+  width: 320px;
+  padding: 24px 20px;
+  color: #ffffff;
+
+  /* Зураг дээрхтэй ижил гүн ногоон уусалттай фоны өнгө */
+  background: linear-gradient(160deg, #0b3c33 0%, #082922 100%);
+
+  /* Булангуудыг дугуйлах & Дээд голд нь ховил (notch) үүсгэх path */
+  /* Хэрэв картны урт/өргөн өөрчлөгдвөл clip-path-ийг responsive болгох SVG mask ашиглана */
+  clip-path: path('M 0,24 A 24,24 0 0 1 24,0 L 105,0 C 120,0 125,24 160,24 C 195,24 200,0 215,0 L 296,0 A 24,24 0 0 1 320,24 L 320,136 A 24,24 0 0 1 296,160 L 24,160 A 24,24 0 0 1 0,136 Z');
+
+  /* Зөөлөн сүүдэр болон хүрээний эффект */
+  filter: drop-shadow(0px 10px 20px rgba(0, 0, 0, 0.25));
+}
+
+/* Доторх текст болон дизайны тохиргоо */
+.card-title-notched {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+  margin-top: 10px;
+  margin-bottom: 6px;
+}
+
+.card-amount-notched {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.eye-icon-notched {
+  font-size: 18px;
+  opacity: 0.85;
+  cursor: pointer;
+}
   </style>
 </head>
 <body>
@@ -118,17 +162,18 @@
       <div style="font-size: 14px;">Drinks claimed: <b id="bannerCount1">0</b>/5</div>
     </div>
 
-      <button class="btn-claim" id="claimBtn" onclick="claimDrink()" style="display: none;">🥤 Claim Drink (+1)</button>
-                <!-- BANNER FOR THE SERVER -->
-    <div id="successBanner" class="successBanner">
-      <div class="banner-title">✅ PLEASE PROVIDE THE DRINK</div>
-      <div class="user-name" id="bannerName">-</div>
-      <div class="user-name" id="bannerLname">-</div>
-      <div style="font-size: 14px;">Drinks claimed: <b id="bannerCount">0</b>/5</div>
+      
+
+
+    <div class="notched-card" id="notchched_card">
+      <div class="card-title-notched">Drinks claimed: </div>
+      <div class="card-amount-notched">
+
+      <b>0</b>/5
     </div>
     
     </div>
-
+    <button class="btn-claim" id="claimBtn" onclick="claimDrink()" style="display: none;">🥤 Claim Drink (+1)</button>
 
 
     
@@ -161,6 +206,13 @@
 
           const claimBtn = document.getElementById('claimBtn');
           claimBtn.style.display = 'block';
+
+          const notched_card = document.getElementById('notched_card');
+          notched_card.style.display = 'block';
+
+          const err = document.getElementById('errorBox');
+          err.style.display = 'none';
+
 
 
           if (data.drinkCount >= 5) {
@@ -252,6 +304,10 @@
       const err = document.getElementById('errorBox');
       err.innerText = msg;
       err.style.display = 'block';
+
+      document.getElementById('infoBanner').style.display = 'none';
+        const claimBtn = document.getElementById('claimBtn');
+        claimBtn.style.display = 'none';
     }
   </script>
 
