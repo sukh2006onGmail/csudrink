@@ -225,6 +225,16 @@
           showError("❌ " + data.message);
           claimBtn.disabled = false;
           claimBtn.innerText = "🥤 Claim Drink (+1)";
+
+          if (data.drinkCount >= 5) {
+            //showError("❌ You have already claimed the maximum number of drinks (5).");
+            claimBtn.disabled = true;
+            claimBtn.innerText = "🥤 Claim Drink (+1)";
+          } else {
+            claimBtn.disabled = false;
+            claimBtn.innerText = "🥤 Claim Drink (+1)";
+          }
+          
         }
       } catch (err) {
         showError("❌ Connection error! Please try again.");
