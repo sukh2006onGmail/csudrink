@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Screen QR Request Modal</title>
+    <!-- FontAwesome Icons for UI elements -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b111e;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* Main Screen Trigger Styling */
+        .launcher-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 32px 24px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .launcher-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34d399;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 20px auto;
+        }
+
+        .launcher-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #f8fafc;
+        }
+
+        .launcher-desc {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+
+        /* Mobile Screen Outer Container */
+        .modal-container {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, #062b22 0%, #031712 50%, #010a08 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        @media (min-width: 640px) {
+            .modal-container {
+                max-width: 410px;
+                height: 820px;
+                border-radius: 36px;
+                border: 1px solid rgba(16, 185, 129, 0.15);
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            }
+        }
+
+        /* Header Navigation Controls */
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 8px;
+            padding-bottom: 16px;
+        }
+
+        .nav-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 18px;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.18);
+            color: #e2e8f0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.92);
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        /* Body Content Area */
+        .modal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 0;
+            gap: 20px;
+        }
+
+        .scan-instruction {
+            color: #8da39c;
+            font-size: 15px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .qr-card-container {
+            width: 100%;
+            background: #041f18;
+            border: 1px solid #0a362b;
+            border-radius: 28px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* PLACEHOLDER FOR USER CUSTOM QR CODE */
+        .qr-placeholder-area {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border: 2px dashed rgba(16, 185, 129, 0.25);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            transition: border-color 0.3s ease;
+        }
+
+        .qr-placeholder-area:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .qr-placeholder-icon {
+            font-size: 48px;
+            color: rgba(16, 185, 129, 0.4);
+            margin-bottom: 12px;
+        }
+
+        .qr-placeholder-text {
+            color: rgba(16, 185, 129, 0.8);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .qr-placeholder-sub {
+            color: #617b73;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .detection-hint {
+            color: #617b73;
+            font-size: 13px;
+            text-align: center;
+            line-height: 1.5;
+            padding: 0 12px;
+        }
+
+
+        .glow-emerald-btn:hover {
+            background: linear-gradient(180deg, #0c4338 0%, #072e27 100%);
+            border-color: #26cba2;
+            box-shadow: 
+                0 0 22px rgba(38, 203, 162, 0.65),
+                inset 0 1px 2px rgba(255, 255, 255, 0.35),
+                0 6px 16px rgba(0, 0, 0, 0.6);
+        }
+
+
+
+        .modal-footer {
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Launcher Interface -->
+    <main class="launcher-card">
+        <div class="launcher-icon">
+            <i class="fa-solid fa-qrcode"></i>
+        </div>
+        <h1 class="launcher-title">QR Request Dialog</h1>
+        <p class="launcher-desc">
+            Энхүү товчлуур дээр дарснаар гар утасны дэлгэц дүүрэн QR request dialog нээгдэнэ.
+        </p>
+        <button id="openModalBtn" class="glow-emerald-btn">
+            Open Request Dialog
+        </button>
+    </main>
+
+    <!-- Full Screen Mobile Overlay Modal -->
+    <div id="requestModal" class="modal-overlay">
+        
+        <!-- Mobile View Frame -->
+        <div class="modal-container">
+            
+            <!-- Top Navigation Header -->
+            <header class="modal-header">
+                <!-- Top-Left Back Close Button -->
+                <button id="closeHeaderBtn" class="nav-btn" aria-label="Go back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="header-title">Request</h2>
+                <div class="notification-wrapper">
+                    <button class="nav-btn" aria-label="Notifications">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    <span class="notification-dot"></span>
+                </div>
+            </header>
+
+            <!-- Main Body Section -->
+            <section class="modal-body">
+                <p class="scan-instruction">Scan the QR code of the device</p>
+
+                <!-- Dark Green Card Area -->
+                <div class="qr-card-container">
+                    
+                    <!-- ==================================================== -->
+                    <!-- USER QR CODE CONTAINER PLACEHOLDER                   -->
+                    <!-- Replace the div below with your custom <img> / <canvas> -->
+                    <!-- ==================================================== -->
+                    <div id="userQrContainer" class="qr-placeholder-area">
+                        <i class="fa-solid fa-qrcode qr-placeholder-icon"></i>
+                        <span class="qr-placeholder-text">QR кодоо энд байрлуулна уу</span>
+                        <span class="qr-placeholder-sub">(Paste your QR canvas or image here)</span>
+                    </div>
+
+                </div>
+
+                <p class="detection-hint">
+                    The QR code will be automatically detected when you position it between the guide lines.
+                </p>
+            </section>
+
+            <!-- Footer Area with Glowing Green Share Link Button -->
+            <footer class="modal-footer">
+                <button id="shareLinkBtn" class="glow-emerald-btn">
+                    Share Link
+                </button>
+            </footer>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openModalBtn = document.getElementById('openModalBtn');
+            const closeHeaderBtn = document.getElementById('closeHeaderBtn');
+            const shareLinkBtn = document.getElementById('shareLinkBtn');
+            const requestModal = document.getElementById('requestModal');
+
+            // Open Modal Function
+            function openModal() {
+                requestModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // Close Modal Function
+            function closeModal() {
+                requestModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Event Listeners
+            openModalBtn.addEventListener('click', openModal);
+            
+            // Both the header back arrow and the bottom "Share Link" button close the modal
+            closeHeaderBtn.addEventListener('click', closeModal);
+            shareLinkBtn.addEventListener('click', closeModal);
+
+            // Close modal on 'Escape' key press
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && requestModal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
