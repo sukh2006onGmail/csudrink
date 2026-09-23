@@ -524,12 +524,19 @@
     const openModalBtn = document.getElementById('openModalBtn');
     openModalBtn.addEventListener('click', openModal);
     const requestModal = document.getElementById('requestModal');
+    const closeHeaderBtn = document.getElementById('closeHeaderBtn');
+    closeHeaderBtn.addEventListener('click', closeModal);
 
     // Open Modal Function
     function openModal() {
         requestModal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
+
+       function closeModal() {
+                requestModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
           
 
     async function claimDrink() {
