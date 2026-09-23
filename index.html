@@ -219,7 +219,10 @@
             claimBtn.disabled = false;
             claimBtn.innerText = "🥤 Claim Drink (+1)";
           }
-          
+
+          const err = document.getElementById('errorBox');
+          err.style.display = 'none';
+              
 
         } else {
           showError("❌ " + data.message);
@@ -234,7 +237,7 @@
             claimBtn.disabled = false;
             claimBtn.innerText = "🥤 Claim Drink (+1)";
           }
-          
+
         }
       } catch (err) {
         showError("❌ Connection error! Please try again.");
