@@ -721,8 +721,8 @@ Let’s make the most of the day, enjoy some fresh autumn air, have fun together
 
         } else {
           showError("❌ " + data.message);
-          claimBtn.disabled = false;
-          claimBtn.innerText = "🥤 Claim Drink (+1)";
+          openModalBtn.disabled = false;
+          openModalBtn.innerText = "🥤 Claim Drink (+1)";
 
           if (data.drinkCount >= 5) {
             //showError("❌ You have already claimed the maximum number of drinks (5).");
@@ -743,8 +743,8 @@ Let’s make the most of the day, enjoy some fresh autumn air, have fun together
         }
       } catch (err) {
         showError("❌ Connection error! Please try again.");
-        claimBtn.disabled = false;
-        claimBtn.innerText = "🥤 Claim Drink (+1)";
+        openModalBtn.disabled = false;
+        openModalBtn.innerText = "🥤 Claim Drink (+1)";
 
         closeModal()
 
