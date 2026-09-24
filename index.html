@@ -81,6 +81,17 @@
     .user-name { font-size: 22px; font-weight: 800; margin: 5px 0; 
     color: rgba(255, 255, 255, 0.75); 
     }
+    .staff-detail {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 42px;
+      gap: 10px;
+      align-items: baseline;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .staff-detail-value {
+      text-align: right;
+    }
     .live-clock { font-size: 26px; font-weight: 800; background: rgba(0,0,0,0.18); padding: 8px 15px; border-radius: 10px; display: inline-block; margin: 12px 0; letter-spacing: 1px; }
 
     /* Toast / error message */
@@ -399,6 +410,20 @@
   cursor: pointer;
   font-size: 16px;
 }
+.info_msg{
+white-space: pre-line;
+text-align: left;
+color: rgba(16, 185, 129, 0.8);
+}
+
+.info_msg1{
+white-space: pre-line;
+text-align: left;
+/* color: rgba(16, 185, 129, 0.8); */
+/* color: rgba(16, 185, 129, 0.4); */
+/* color:rgba(16, 185, 129, 0.5); */
+color: #0A3127
+}
 
   </style>
 </head>
@@ -414,19 +439,40 @@
       <div class="input-group">
         <img class="hero-image" src="Oirkhon_web_small.jpg" alt="Oirkhon travel destination">
         <h2>2026 Staff Fall Camping</h2>
+
+                <section class="modal-body">
+                <p class="info_msg1"  >Please find the Autumn Outing Program attached and take a moment to check the schedule. 
+
+📅 Date: September 26
+🚌 Bus Departure: 6:30–7:00 AM
+📍 Meeting Point: School parking lot
+
+⏰ Please make sure to arrive on time and avoid being late. The buses will depart according to the schedule, so please plan accordingly.
+
+🚗 Please note: For this outing, everyone is expected to travel by the school buses. Unfortunately, travelling by private car will not be possible.
+
+Let’s make the most of the day, enjoy some fresh autumn air, have fun together, and create some great memories! 🍂✨
+</p>    
+            </section>
+
+
         <label for="phoneInput">Enter your registered phone number.</label>
         <input type="number" id="phoneInput" placeholder="________" pattern="[0-9]*" onkeypress="if(event.key==='Enter') checkStaff()" />
       </div>
 
-      <button class="btn-claim" id="checkBtn" onclick="checkStaff()">Check phone number</button>
+      <button type="button" class="btn-claim" id="checkBtn" onclick="checkStaff()">Check phone number</button>
       <!-- <button class="glow-emerald-btn" id="checkBtn" onclick="checkStaff()">Check phone number</button> -->
       <div id="errorBox"></div>
 
 
         <div id="infoBanner" class="successBanner">
-      <div class="banner-title" id="buss_number"></div>
-      <div class="user-name" id="bannerName1">-</div>
-      <div class="user-name" id="bannerLname1">-</div>
+          <div class="user-name" id="bannerName1">-</div>
+      <div class="user-name staff-detail"><span>Your numbers1 is</span><span class="staff-detail-value" id="numbers1">-</span></div>
+      <div class="user-name staff-detail"><span>Your bus number is</span><span class="staff-detail-value" id="buss_number">-</span></div>
+      <div class="user-name staff-detail"><span>Your numbers2 is</span><span class="staff-detail-value" id="numbers2">-</span></div>
+      <div class="user-name staff-detail"><span>Your tent number is</span><span class="staff-detail-value" id="tent_number">-</span></div>
+      
+      <div class="user-name" id="bannerLname1" style="visibility: hidden;">-</div>
       <div style="font-size: 14px;">Drinks claimed: <b id="bannerCount1">0</b>/5</div>
     </div>
 
@@ -482,55 +528,136 @@
 
         </div>
     </div>
+
+
+        <button id="openInfoBtn" class="glow-emerald-btn" style="display: none;"> Get Info </button>
+        <!-- <button id="openModalBtn_info" class="glow-emerald-btn" > Get Info </button> -->
+    <!-- <button id="openModalBtn" class="glow-emerald-btn"> 🥤 Claim Drink (+1) </button> -->
+        <div id="requestModal_info" class="modal-overlay">
+        <div class="modal-container">
+            <header class="modal-header">
+                <button id="closeHeaderBtn_info" class="nav-btn" aria-label="Go back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="header-title">Info</h2>
+                <div class="notification-wrapper">
+                    <!--<button class="nav-btn" aria-label="Notifications">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    <span class="notification-dot"></span>-->
+                </div>
+            </header>
+
+            <!-- Main Body Section -->
+            <section class="modal-body">
+                <p class="info_msg"  >Please find the Autumn Outing Program attached and take a moment to check the schedule. 
+
+📅 Date: September 26
+🚌 Bus Departure: 6:30–7:00 AM
+📍 Meeting Point: School parking lot
+
+⏰ Please make sure to arrive on time and avoid being late. The buses will depart according to the schedule, so please plan accordingly.
+
+🚗 Please note: For this outing, everyone is expected to travel by the school buses. Unfortunately, travelling by private car will not be possible.
+
+Let’s make the most of the day, enjoy some fresh autumn air, have fun together, and create some great memories! 🍂✨
+</p>    
+            </section>
+            <footer class="modal-footer">
+                <button id="shareLinkBtn_info" class="glow-emerald-btn" onclick="closeModal_info()"> Close info </button>
+            </footer>
+
+        </div>
+    </div>
     
   </div>
 
   <script>
-    // Replace this with your own Apps Script URL.
-    // const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby48AGGTzygrb0kCK6yVxtET7RB4y5d0q6G8IgEL7VZuTzSNMNlBvqArNtH5tn8GOXAeg/exec";
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1xmPvPE5BzXJ7zyNHfrN1XFkXDnTOpTAY6RDN4LNz5nWDhCO2KDTwgQHiGZMwdDw-OQ/exec";
 
+    const requestModal = document.getElementById('requestModal');
+    const openModalBtn = document.getElementById('openModalBtn');
+    openModalBtn.addEventListener('click', openModal);
+    function openModal() {
+        requestModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }    
+    const closeHeaderBtn = document.getElementById('closeHeaderBtn');
+    closeHeaderBtn.addEventListener('click', closeModal);
+    function closeModal() {
+            requestModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+    const openInfoBtn = document.getElementById('openInfoBtn');
+    openInfoBtn.addEventListener('click', openModal_info);
+    const requestModal_info = document.getElementById('requestModal_info');
+    const closeHeaderBtn_info = document.getElementById('closeHeaderBtn_info');
+    closeHeaderBtn_info.addEventListener('click', closeModal_info);
+    function openModal_info() { console.info("openModal_info called");
+        requestModal_info.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal_info() {
+        requestModal_info.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+
+
+    let isChecking = false;
     async function checkStaff() {
+      if (isChecking) return;
+
+      const phoneInput = document.getElementById('phoneInput');      
       const phone = phoneInput.value.trim();
       if (!phone || phone.length < 8) {
                 showError("⚠️ Please enter a valid phone number!");
                 return;
       }
 
+      isChecking = true;
+      const checkBtn = document.getElementById('checkBtn');
+      checkBtn.innerText = "⏳ Checking...";
+      checkBtn.disabled = true;    
+
+      const infoBanner = document.getElementById('infoBanner')
+      infoBanner.style.display = 'none';
+      // const claimBtn = document.getElementById('claimBtn');
+      // claimBtn.style.display = 'none';
+      const openModalBtn = document.getElementById('openModalBtn');
+      openModalBtn.style.display = 'none';
+
+
+
        try {
         const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=check&phone=${encodeURIComponent(phone)}`, { redirect: "follow" });
         const data = await response.json();
 
         if (data.success) {
-          // Hide the form and show the success banner.
-          //document.getElementById('formSection').style.display = 'none';
-          document.getElementById('buss_number').innerText = `Your bus number is #${data.bus}`;
-          document.getElementById('bannerName1').innerText = data.name;
-          document.getElementById('bannerLname1').innerText = data.lname;
+          document.getElementById('bannerName1').innerText = data.name + ' ' + data.lname ;
+          document.getElementById('numbers1').innerText = `${data.numbers1}`;
+          document.getElementById('buss_number').innerText = `${data.busNumber}`;
+          document.getElementById('numbers2').innerText = `${data.numbers2}`;
+          document.getElementById('tent_number').innerText = `${data.tentNumber}`;
+          
+          // document.getElementById('bannerLname1').innerText = data.lname;
           document.getElementById('bannerCount1').innerText = data.drinkCount;
           document.getElementById('infoBanner').style.display = 'block';
+          // openModalBtn.style.display = 'block';
 
-          const claimBtn = document.getElementById('claimBtn');
-          claimBtn.style.display = 'block';
-          document.getElementById('openModalBtn').style.display = 'block';
-
-   
-
-          // const notched_card = document.getElementById('notched_card');
-          // notched_card.style.display = 'block';
-
-          const err = document.getElementById('errorBox');
-          err.style.display = 'none';
+          const errorBox = document.getElementById('errorBox');
+          errorBox.style.display = 'none';
 
 
 
           if (data.drinkCount >= 5) {
-            //showError("❌ You have already claimed the maximum number of drinks (5).");
-            claimBtn.disabled = true;
-            claimBtn.innerText = "🥤 Claim Drink (+1)";
+            openModalBtn.disabled = true;
+            openModalBtn.style.display = "none";
+            openModalBtn.innerText = "🥤 Claim Drink (+1)";
           } else {
-            claimBtn.disabled = false;
-            claimBtn.innerText = "🥤 Claim Drink (+1)";
+            openModalBtn.disabled = false;
+            openModalBtn.innerText = "🥤 Claim Drink (+1)";
           }
 
 
@@ -540,68 +667,51 @@
         }
       } catch (err) {
         showError("❌ Connection error! Please try again.");
+      } finally {
+        checkBtn.disabled = false;
+        checkBtn.innerText = "Check phone number";
+        isChecking = false;
       }
 
     }
 
 
-    const openModalBtn = document.getElementById('openModalBtn');
-    openModalBtn.addEventListener('click', openModal);
-    const requestModal = document.getElementById('requestModal');
-    const closeHeaderBtn = document.getElementById('closeHeaderBtn');
-    closeHeaderBtn.addEventListener('click', closeModal);
 
-    // Open Modal Function
-    function openModal() {
-        requestModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
 
-       function closeModal() {
-                requestModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-          
 
+    let isFetching = false;
     async function claimDrink() {
+      if (isFetching) return;
+
       const phoneInput = document.getElementById('phoneInput');
       const phone = phoneInput.value.trim();
-      const claimBtn = document.getElementById('claimBtn');
+      const openModalBtn = document.getElementById('openModalBtn');
       const errorBox = document.getElementById('errorBox');
 
       errorBox.style.display = 'none';
-
+      isFetching = true;
       
 
-      claimBtn.disabled = true;
-      claimBtn.innerText = "⏳ Checking...";
+      openModalBtn.disabled = true;
+      openModalBtn.innerText = "⏳ Checking...";
 
       try {
         const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=claim&phone=${encodeURIComponent(phone)}`, { redirect: "follow" });
         const data = await response.json();
 
         if (data.success) {
-          // Hide the form and show the success banner.
-          //document.getElementById('formSection').style.display = 'none';
-          // document.getElementById('bannerName').innerText = data.name;
           document.getElementById('bannerCount1').innerText = data.drinkCount;
-          // document.getElementById('successBanner').style.display = 'block';
-
-          // Update the clock every second to prevent screenshot reuse.
-          // updateClock();
-          // setInterval(updateClock, 1000);
 
           if (data.drinkCount >= 5) {
             //showError("❌ You have already claimed the maximum number of drinks (5).");
-            claimBtn.disabled = true;
-            claimBtn.innerText = "🥤 Claim Drink (+1)";
+            openModalBtn.disabled = true;
+            openModalBtn.style.display = "none";
+            openModalBtn.innerText = "🥤 Claim Drink (+1)";
           } else {
-            claimBtn.disabled = false;
-            claimBtn.innerText = "🥤 Claim Drink (+1)";
+            openModalBtn.disabled = false;
+            openModalBtn.innerText = "🥤 Claim Drink (+1)";
           }
-
           closeModal()
-
           const err = document.getElementById('errorBox');
           err.style.display = 'none';
               
@@ -613,12 +723,17 @@
 
           if (data.drinkCount >= 5) {
             //showError("❌ You have already claimed the maximum number of drinks (5).");
-            claimBtn.disabled = true;
-            claimBtn.innerText = "🥤 Claim Drink (+1)";
+            openModalBtn.disabled = true;
+            openModalBtn.style.display = "none";
+            openModalBtn.innerText = "🥤 Claim Drink (+1)";
           } else {
-            claimBtn.disabled = false;
-            claimBtn.innerText = "🥤 Claim Drink (+1)";
+            openModalBtn.disabled = false;
+            openModalBtn.innerText = "🥤 Claim Drink (+1)";
           }
+
+
+
+
 
           closeModal()
 
@@ -631,6 +746,8 @@
         closeModal()
 
 
+      }finally {
+        isFetching = false;
       }
     }
 
